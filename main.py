@@ -66,35 +66,12 @@ class LoginSystem:
         self.root = root
         self.root.title("Login System")
         self.root.geometry("400x300")
-        self.root.resizable(False, False)
+        self.root.resizable(True, True)
+        self.root.state('zoomed')  # Start maximized
         
         # Center the window
         self.center_window(400, 300)
         
-        # ENCAPSULATION & POLYMORPHISM: Create user objects
-        profile_data = [
-            ("Name:", "Dela Cruz Eugene Kim A."),
-            ("Age:", "19"),
-            ("Where do I live:", "Manghinao Proper Bauan Batangas"),
-            ("High school graduated:", "Bauan Technical Integrated High School"),
-            ("Current School:", "BSU Mabini Campus"),
-            ("Hobby:", "Gaming, Workout, Game Programming")
-        ]
-        
-        # Regular user
-        self.regular_user = User("eugene", "123456", profile_data)
-        
-        
-        self.current_user = None  # Track currently logged in user
-        
-        self.create_login_page()
-    
-    def center_window(self, width, height):
-        screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight()
-        x = (screen_width - width) // 2
-        y = (screen_height - height) // 2
-        self.root.geometry(f"{width}x{height}+{x}+{y}")
         # ENCAPSULATION: Create user object
         profile_data = [
             ("Name:", "Dela Cruz Eugene Kim A."),
@@ -109,6 +86,32 @@ class LoginSystem:
         self.user = User("eugene", "123456", profile_data)
         
         self.current_user = None  # Track currently logged in user
+        
+        self.create_login_page()
+    
+    def center_window(self, width, height):
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2
+        self.root.geometry(f"{width}x{height}+{x}+{y}")
+    
+    def create_login_page(self):
+        # Clear the window
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        
+        # Title
+        title_label = tk.Label(self.root, text="Login System", font=("Arial", 24, "bold"))
+        title_label.pack(pady=30)
+        
+        # Username
+        username_frame = tk.Frame(self.root)
+        username_frame.pack(pady=10)
+        tk.Label(username_frame, text="Username:", font=("Arial", 12)).pack(side=tk.LEFT, padx=5)
+        self.username_entry = tk.Entry(username_frame, font=("Arial", 12), width=20)
+        self.username_entry.pack(side=tk.LEFT, padx=5)
+        
         # Password
         password_frame = tk.Frame(self.root)
         password_frame.pack(pady=10)
@@ -127,9 +130,6 @@ class LoginSystem:
     def login(self):
         entered_username = self.username_entry.get()
         entered_password = self.password_entry.get()
-    def login(self):
-        entered_username = self.username_entry.get()
-        entered_password = self.password_entry.get()
         
         # ENCAPSULATION: Use authenticate method
         if self.user.authenticate(entered_username, entered_password):
@@ -138,6 +138,9 @@ class LoginSystem:
         else:
             messagebox.showerror("Login Failed", "Invalid username or password!")
             self.password_entry.delete(0, tk.END)
+    
+    def show_profile(self):
+        # Clear the window
         for widget in self.root.winfo_children():
             widget.destroy()
         
@@ -152,7 +155,7 @@ class LoginSystem:
         
         # Profile Picture
         try:
-            image_path = os.path.join(os.path.dirname(__file__), "Kim.png")
+            image_path = os.path.join(os.path.dirname(__file__), "65ae0309-785a-4001-91b3-111697cf5092.jpg")
             img = Image.open(image_path)
             img = img.resize((150, 150), Image.Resampling.LANCZOS)
             photo = ImageTk.PhotoImage(img)
@@ -167,8 +170,7 @@ class LoginSystem:
         info_frame = tk.Frame(self.root, bg="#f0f0f0", padx=20, pady=20)
         info_frame.pack(pady=20, padx=40, fill=tk.BOTH, expand=True)
         
-        # ENCAPSULATION & POLYMORPHISM: Get data through encapsulated method
-        # Different user types return different data (polymorphism)
+        # ENCAPSULATION: Get data through encapsulated method
         profile_data = self.current_user.get_user_data()
         
         for label_text, value_text in profile_data:
