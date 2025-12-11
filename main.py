@@ -84,8 +84,6 @@ class LoginSystem:
         # Regular user
         self.regular_user = User("eugene", "123456", profile_data)
         
-        # Admin user (demonstrates polymorphism)
-        self.admin_user = AdminUser("admin", "admin123", profile_data, admin_level=5)
         
         self.current_user = None  # Track currently logged in user
         
