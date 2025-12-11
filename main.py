@@ -61,32 +61,6 @@ class User(AuthenticationSystem):
         """Logout user"""
         self.__is_authenticated = False
 
-# POLYMORPHISM: AdminUser inherits from User and overrides methods
-class AdminUser(User):
-    """Admin user with extended privileges - demonstrates Polymorphism"""
-    
-    def __init__(self, username, password, profile_data, admin_level):
-        super().__init__(username, password, profile_data)
-        self.__admin_level = admin_level
-    
-    # POLYMORPHISM: Overriding parent method with different behavior
-    def authenticate(self, username, password):
-        """Override authenticate to add admin logging"""
-        result = super().authenticate(username, password)
-        if result:
-            print(f"Admin user '{username}' logged in with level {self.__admin_level}")
-        return result
-    
-    # POLYMORPHISM: Overriding parent method
-    def get_user_data(self):
-        """Override to include admin level in data"""
-        data = super().get_user_data()
-        if data:
-            data_copy = data.copy()
-            data_copy.append(("Admin Level:", str(self.__admin_level)))
-            return data_copy
-        return None
-
 class LoginSystem:
     def __init__(self, root):
         self.root = root
@@ -123,23 +97,20 @@ class LoginSystem:
         x = (screen_width - width) // 2
         y = (screen_height - height) // 2
         self.root.geometry(f"{width}x{height}+{x}+{y}")
-    
-    def create_login_page(self):
-        # Clear the window
-        for widget in self.root.winfo_children():
-            widget.destroy()
+        # ENCAPSULATION: Create user object
+        profile_data = [
+            ("Name:", "Dela Cruz Eugene Kim A."),
+            ("Age:", "19"),
+            ("Where do I live:", "Manghinao Proper Bauan Batangas"),
+            ("High school graduated:", "Bauan Technical Integrated High School"),
+            ("Current School:", "BSU Mabini Campus"),
+            ("Hobby:", "Gaming, Workout, Game Programming")
+        ]
         
-        # Title
-        title_label = tk.Label(self.root, text="Login System", font=("Arial", 24, "bold"))
-        title_label.pack(pady=30)
+        # User object
+        self.user = User("eugene", "123456", profile_data)
         
-        # Username
-        username_frame = tk.Frame(self.root)
-        username_frame.pack(pady=10)
-        tk.Label(username_frame, text="Username:", font=("Arial", 12)).pack(side=tk.LEFT, padx=5)
-        self.username_entry = tk.Entry(username_frame, font=("Arial", 12), width=20)
-        self.username_entry.pack(side=tk.LEFT, padx=5)
-        
+        self.current_user = None  # Track currently logged in user
         # Password
         password_frame = tk.Frame(self.root)
         password_frame.pack(pady=10)
@@ -158,20 +129,17 @@ class LoginSystem:
     def login(self):
         entered_username = self.username_entry.get()
         entered_password = self.password_entry.get()
+    def login(self):
+        entered_username = self.username_entry.get()
+        entered_password = self.password_entry.get()
         
-        # POLYMORPHISM: Different user types authenticate differently
-        if self.regular_user.authenticate(entered_username, entered_password):
-            self.current_user = self.regular_user
-            self.show_profile()
-        elif self.admin_user.authenticate(entered_username, entered_password):
-            self.current_user = self.admin_user
+        # ENCAPSULATION: Use authenticate method
+        if self.user.authenticate(entered_username, entered_password):
+            self.current_user = self.user
             self.show_profile()
         else:
             messagebox.showerror("Login Failed", "Invalid username or password!")
             self.password_entry.delete(0, tk.END)
-    
-    def show_profile(self):
-        # Clear the window
         for widget in self.root.winfo_children():
             widget.destroy()
         
@@ -223,14 +191,18 @@ class LoginSystem:
         logout_btn.pack(pady=20)
     
     def logout(self):
-        # ENCAPSULATION: Use encapsulated logout method
-        if self.current_user:
-            self.current_user.logout()
-            self.current_user = None
+        # Confirmation dialog before logout
+        result = messagebox.askyesno("Confirm Logout", "Are you sure you want to log out?")
         
-        self.root.geometry("400x300")
-        self.center_window(400, 300)
-        self.create_login_page()
+        if result:  # If user clicked "Yes"
+            # ENCAPSULATION: Use encapsulated logout method
+            if self.current_user:
+                self.current_user.logout()
+                self.current_user = None
+            
+            self.root.geometry("400x300")
+            self.center_window(400, 300)
+            self.create_login_page()
 
 if __name__ == "__main__":
     root = tk.Tk()
